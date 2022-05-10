@@ -1,88 +1,101 @@
-const nums = document.querySelectorAll("[data-nums]");
+const numbers = document.querySelectorAll("[data-num]");
 const backspace = document.querySelector("[data-backspace]");
 const clear = document.querySelector("[data-all-clear]");
-const displayCurrentNum = document.querySelector(".screen h2");
-const displayPrevNumAndOperator = document.querySelector(".screen h3");
+const currentOperand = document.querySelector(".screen h2");
+const previousOperand = document.querySelector(".screen h3");
 const equals = document.querySelector("[data-equals]");
 const operators = document.querySelectorAll("[data-operator]");
 
-let currentNum = "";
-let previousNum = "";
 let operation = null;
-let total = "";
 
-nums.forEach((num) => {
-  num.addEventListener("click", (e) => {
-    const num = e.target.textContent;
-    storeNum(num);
-    updateUI();
+numbers.forEach((number) => {
+  number.addEventListener("click", (e) => {
+    let number = e.target.textContent;
+    if (number === "." && currentOperand.textContent === "") {
+      number = "0.";
+    }
+    appendNumber(number);
   });
 });
 
 operators.forEach((operator) => {
   operator.addEventListener("click", (e) => {
-    if (currentNum != "" && previousNum != "" && operation != "") {
-      calculate();
-      previousNum = total;
-      currentNum = "";
-      operation = e.target.id;
-      updateUI();
-      return;
+    if (
+      currentOperand.textContent != "" &&
+      previousOperand.textContent === ""
+    ) {
+      const element = e.target;
+      const total = currentOperand.textContent;
+      updateDisplay(element, total);
     }
-    if (currentNum != "") {
-      operation = e.target.id;
-      storeNum();
-      updateUI();
+    if (
+      currentOperand.textContent != "" &&
+      previousOperand.textContent != "" &&
+      operation != null
+    ) {
+      const total = compute();
+      const element = e.target;
+      updateDisplay(element, total);
     }
   });
 });
 
 clear.addEventListener("click", (e) => {
-  total = "";
-  currentNum = "";
-  previousNum = "";
   operation = null;
-  displayPrevNumAndOperator.textContent = "";
-  displayCurrentNum.textContent = 0;
-});
-
-equals.addEventListener("click", (e) => {
-  if (currentNum == "" && previousNum == "") return;
-  calculate();
-  currentNum = "";
-  previousNum = "";
-  displayCurrentNum.textContent = total;
-  total = "";
-  operation = "";
-  displayPrevNumAndOperator.textContent = "";
+  currentOperand.textContent = "";
+  previousOperand.textContent = "";
 });
 
 backspace.addEventListener("click", (e) => {
-  if (currentNum == "") return;
-  currentNum = `${currentNum.slice(0, -1)}`;
-  updateUI();
+  if (currentOperand.textContent != "") {
+    currentOperand.textContent = `${currentOperand.textContent.slice(0, -1)}`;
+  }
 });
 
-function storeNum(num) {
-  if (num === "." && currentNum.includes(num)) return;
-  if (!operation || previousNum) {
-    currentNum += num;
-  } else {
-    previousNum = currentNum;
-    currentNum = "";
+equals.addEventListener("click", (e) => {
+  if (
+    currentOperand.textContent != "" &&
+    previousOperand.textContent != "" &&
+    operation != null
+  ) {
+    const total = compute();
+    currentOperand.textContent = `${total}`;
+    previousOperand.textContent = "";
+    operation = null;
   }
+});
+
+function appendNumber(number) {
+  if (number === "." && currentOperand.textContent.includes(number)) return;
+  currentOperand.textContent += number;
 }
 
-function updateUI() {
-  displayCurrentNum.textContent = currentNum;
-  displayPrevNumAndOperator.innerHTML = `${previousNum}<i class = "fa-solid fa-${operation}"></i>`;
+function compute() {
+  const num1 = Number(previousOperand.textContent);
+  const num2 = Number(currentOperand.textContent);
+  let total;
+  switch (operation) {
+    case "+":
+      total = num1 + num2;
+      break;
+    case "-":
+      total = num1 - num2;
+      break;
+    case "*":
+      total = num1 * num2;
+      break;
+    case "/":
+      total = num1 / num2;
+      break;
+    default:
+      return;
+  }
+  return total;
 }
 
-function calculate() {
-  previousNum = Number(previousNum);
-  currentNum = Number(currentNum);
-  if (operation === "plus") total = previousNum + currentNum;
-  if (operation === "minus") total = previousNum - currentNum;
-  if (operation === "xmark") total = previousNum * currentNum;
-  if (operation === "divide") total = previousNum / currentNum;
+function updateDisplay(element, total) {
+  operation = element.id;
+  currentOperand.textContent = "";
+  previousOperand.innerHTML = `${total} <i class= "fa-solid fa-${element.classList[1]}"></i>`;
+  currentOperand.textContent = "";
 }
