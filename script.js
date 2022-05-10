@@ -19,21 +19,6 @@ nums.forEach((num) => {
   });
 });
 
-function storeNum(num) {
-  if (num === "." && currentNum.includes(num)) return;
-  if (!operation || previousNum) {
-    currentNum += num;
-  } else {
-    previousNum = currentNum;
-    currentNum = "";
-  }
-}
-
-function updateUI() {
-  displayCurrentNum.textContent = currentNum;
-  displayPrevNumAndOperator.innerHTML = `${previousNum}<i class = "fa-solid fa-${operation}"></i>`;
-}
-
 operators.forEach((operator) => {
   operator.addEventListener("click", (e) => {
     if (currentNum != "" && previousNum != "" && operation != "") {
@@ -51,15 +36,6 @@ operators.forEach((operator) => {
     }
   });
 });
-
-function calculate() {
-  previousNum = Number(previousNum);
-  currentNum = Number(currentNum);
-  if (operation === "plus") total = previousNum + currentNum;
-  if (operation === "minus") total = previousNum - currentNum;
-  if (operation === "xmark") total = previousNum * currentNum;
-  if (operation === "divide") total = previousNum / currentNum;
-}
 
 clear.addEventListener("click", (e) => {
   total = "";
@@ -86,3 +62,27 @@ backspace.addEventListener("click", (e) => {
   currentNum = `${currentNum.slice(0, -1)}`;
   updateUI();
 });
+
+function storeNum(num) {
+  if (num === "." && currentNum.includes(num)) return;
+  if (!operation || previousNum) {
+    currentNum += num;
+  } else {
+    previousNum = currentNum;
+    currentNum = "";
+  }
+}
+
+function updateUI() {
+  displayCurrentNum.textContent = currentNum;
+  displayPrevNumAndOperator.innerHTML = `${previousNum}<i class = "fa-solid fa-${operation}"></i>`;
+}
+
+function calculate() {
+  previousNum = Number(previousNum);
+  currentNum = Number(currentNum);
+  if (operation === "plus") total = previousNum + currentNum;
+  if (operation === "minus") total = previousNum - currentNum;
+  if (operation === "xmark") total = previousNum * currentNum;
+  if (operation === "divide") total = previousNum / currentNum;
+}
